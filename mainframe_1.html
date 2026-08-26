@@ -1,0 +1,1202 @@
+<title>Mainframe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --bg:#0a0e12;
+    --panel:#121821;
+    --panel-2:#1a2330;
+    --panel-3:#212c3b;
+    --border:#2a3644;
+    --border-bright:#3e4f63;
+    --text:#e8eef2;
+    --text-dim:#8a99a8;
+    --text-faint:#54626f;
+    --amber:#ffb627;
+    --amber-dim:#7a5c1e;
+    --cyan:#4dd8e6;
+    --magenta:#ff6ec7;
+    --violet:#9c87f5;
+    --green:#3adb76;
+    --red:#ff5c5c;
+    --font-display:'Chakra Petch', 'Arial Narrow', sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-mono);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:clamp(1rem,3vw,2.5rem); }
+
+  h1,h2,h3{font-family:var(--font-display); margin:0; text-wrap:balance;}
+  button{font-family:var(--font-mono); cursor:pointer;}
+  input{font-family:var(--font-mono);}
+  ::selection{background:var(--amber); color:#1a1300;}
+  :focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}
+
+  .eyebrow{
+    font-size:0.7rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-dim);
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:var(--font-mono); font-size:0.8rem; letter-spacing:0.06em; text-transform:uppercase;
+    padding:0.7rem 1.2rem; border-radius:4px; border:1px solid var(--border-bright);
+    background:var(--panel-2); color:var(--text); transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .btn:hover{border-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan) inset, 0 0 16px -4px var(--cyan);}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:0.35; cursor:not-allowed; box-shadow:none; border-color:var(--border);}
+  .btn-primary{background:var(--amber); color:#1a1300; border-color:var(--amber); font-weight:600;}
+  .btn-primary:hover{box-shadow:0 0 0 1px var(--amber) inset, 0 0 20px -4px var(--amber); border-color:var(--amber);}
+  .btn-success{border-color:var(--green); color:var(--green);}
+  .btn-success:hover{box-shadow:0 0 0 1px var(--green) inset, 0 0 16px -4px var(--green); border-color:var(--green);}
+  .btn-danger{border-color:var(--red); color:var(--red);}
+  .btn-danger:hover{box-shadow:0 0 0 1px var(--red) inset, 0 0 16px -4px var(--red); border-color:var(--red);}
+  .btn-ghost{background:transparent; border-color:var(--border);}
+  .btn-sm{padding:0.35rem 0.6rem; font-size:0.7rem;}
+  .btn-row{display:flex; gap:0.6rem; flex-wrap:wrap;}
+
+  /* ---------- start screen ---------- */
+  .start-screen{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1.75rem;
+    width:100%; max-width:720px;
+  }
+  .boot-log{
+    font-size:0.78rem; color:var(--green); text-align:left; width:100%; max-width:480px;
+    min-height:9.5rem; white-space:pre-wrap; word-break:break-word;
+  }
+  .boot-log .cursor{display:inline-block; width:0.55em; background:var(--green); animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .logo-wrap{position:relative;}
+  .logo{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(2.6rem,9vw,4.4rem);
+    letter-spacing:0.05em; color:var(--amber);
+    text-shadow:0 0 24px rgba(255,182,39,0.45), 0 0 2px rgba(255,182,39,0.8);
+  }
+  .tagline{color:var(--text-dim); font-size:0.95rem; max-width:38rem;}
+  .start-hidden{display:none;}
+
+  /* ---------- console frame ---------- */
+  .console{
+    width:100%; max-width:1180px; background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; padding:1.4rem; position:relative; overflow:hidden;
+    box-shadow:0 0 0 6px #060809, 0 30px 60px -25px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.35);
+  }
+  .console::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0.05;
+    background:repeating-linear-gradient(to bottom, #fff 0px, #fff 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:overlay;
+  }
+  .console-header{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.1rem;
+    padding-bottom:0.9rem; border-bottom:1px solid var(--border); flex-wrap:wrap;
+  }
+  .console-title{display:flex; align-items:center; gap:0.6rem;}
+  .console-title .dot{width:9px; height:9px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); flex:none;}
+  .console-title span{font-family:var(--font-display); font-weight:600; letter-spacing:0.08em; font-size:0.95rem; color:var(--text);}
+  .round-label{font-size:0.7rem; color:var(--text-dim); letter-spacing:0.1em; text-transform:uppercase;}
+
+  /* ---------- scoreboard ---------- */
+  .scoreboard{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.7rem; margin-bottom:1.1rem;
+  }
+  .team-card{
+    background:var(--panel-2); border:1px solid var(--border); border-left:4px solid var(--tc,var(--amber));
+    border-radius:8px; padding:0.7rem 0.85rem; display:flex; flex-direction:column; gap:0.3rem; min-width:0;
+  }
+  .team-card.leader{box-shadow:0 0 0 1px var(--tc,var(--amber)) inset;}
+  .team-name-row{display:flex; align-items:center; justify-content:space-between; gap:0.4rem;}
+  .team-name{
+    font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--tc,var(--amber));
+    background:transparent; border:none; padding:0; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .team-name:focus-visible{outline-offset:1px;}
+  .crown{font-size:0.75rem;}
+  .team-score{
+    font-family:var(--font-display); font-size:1.6rem; font-weight:700; font-variant-numeric:tabular-nums; color:var(--text);
+    transition:color .25s ease;
+  }
+  .team-score.pulse-good{color:var(--green);}
+  .team-score.pulse-bad{color:var(--red);}
+  .team-adjust{display:flex; gap:0.3rem;}
+  .team-adjust button{
+    flex:1; background:var(--panel-3); border:1px solid var(--border); color:var(--text-dim); border-radius:4px;
+    font-size:0.75rem; padding:0.15rem 0;
+  }
+  .team-adjust button:hover{color:var(--text); border-color:var(--border-bright);}
+
+  /* ---------- board ---------- */
+  .board-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem;}
+  .cat-header{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.4rem;
+    text-align:center; font-family:var(--font-display); font-size:0.72rem; letter-spacing:0.04em;
+    color:var(--cyan); display:flex; align-items:center; justify-content:center; min-height:3.4rem; text-wrap:balance;
+  }
+  .tile{
+    background:var(--panel-3); border:1px solid var(--border); border-radius:6px; aspect-ratio:5/3;
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700;
+    font-size:clamp(1.1rem,2.6vw,1.6rem); color:var(--amber); position:relative; transition:all .12s ease;
+  }
+  .tile:not(:disabled):hover{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset, 0 0 18px -6px var(--amber); transform:translateY(-1px);}
+  .tile.special{color:var(--violet);}
+  .tile:disabled{color:var(--text-faint); background:var(--panel); cursor:default; opacity:0.55;}
+  .tile:disabled::after{
+    content:"ACCESSED"; position:absolute; font-family:var(--font-mono); font-size:0.55rem; letter-spacing:0.14em;
+    color:var(--text-faint); transform:rotate(-8deg);
+  }
+  .tile:disabled span{display:none;}
+
+  .board-footer{display:flex; justify-content:space-between; align-items:center; margin-top:1rem; gap:1rem; flex-wrap:wrap;}
+
+  /* ---------- system log ---------- */
+  .syslog{
+    margin-top:1rem; background:#080b0f; border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.8rem;
+    font-size:0.72rem; color:var(--text-faint); height:5.4rem; overflow-y:auto; display:flex; flex-direction:column-reverse;
+  }
+  .syslog div{white-space:pre-wrap;}
+  .syslog .hl{color:var(--green);}
+
+  /* ---------- modal overlay ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,6,8,0.82); backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; padding:1.5rem; z-index:50;
+  }
+  .modal{
+    width:100%; max-width:680px; background:var(--panel); border:1px solid var(--border-bright); border-radius:12px;
+    padding:1.8rem; box-shadow:0 0 0 1px rgba(255,255,255,0.02), 0 40px 80px -30px rgba(0,0,0,0.9);
+  }
+  .modal.wager-modal{border-color:var(--violet); box-shadow:0 0 40px -10px rgba(156,135,245,0.35);}
+  .modal.locked-out{border-color:var(--red); box-shadow:0 0 40px -8px rgba(255,92,92,0.5), 0 0 0 1px var(--red) inset;}
+  .modal.shake-once{animation:modalShake 0.5s ease;}
+  @keyframes modalShake{
+    10%,90%{transform:translateX(-1px);}
+    20%,80%{transform:translateX(2px);}
+    30%,50%,70%{transform:translateX(-5px);}
+    40%,60%{transform:translateX(5px);}
+  }
+  .lockout-banner{
+    background:rgba(255,92,92,0.12); border:1px solid var(--red); color:var(--red);
+    font-family:var(--font-display); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    font-size:0.72rem; padding:0.55rem 0.7rem; border-radius:6px; margin-bottom:0.9rem; text-align:center;
+    animation:lockoutPulse 1.3s ease-in-out infinite;
+  }
+  @keyframes lockoutPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+  .modal-eyebrow{color:var(--text-dim); font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.6rem; display:flex; justify-content:space-between;}
+  .modal-value{color:var(--amber); font-family:var(--font-display); font-weight:700;}
+  .modal-body{font-size:1.15rem; color:var(--text); min-height:5rem; margin:0.8rem 0 1.2rem 0; text-wrap:balance;}
+  .modal-answer{
+    border-top:1px dashed var(--border-bright); padding-top:1rem; margin-top:0.4rem; color:var(--green); font-size:1.05rem;
+  }
+  .timer-row{display:flex; align-items:center; gap:0.7rem; margin-bottom:0.9rem;}
+  .timer-bar{flex:1; height:6px; background:var(--panel-3); border-radius:3px; overflow:hidden;}
+  .timer-fill{height:100%; background:var(--cyan); width:100%; transition:width 1s linear, background .3s ease;}
+  .timer-fill.low{background:var(--red);}
+  .timer-num{font-variant-numeric:tabular-nums; color:var(--text-dim); font-size:0.85rem; min-width:2.4em; text-align:right;}
+
+  .award-row{margin-top:1rem;}
+  .award-row .label{font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem;}
+  .award-grid{display:flex; flex-wrap:wrap; gap:0.5rem;}
+  .award-btn{
+    border:1px solid var(--border-bright); border-radius:6px; padding:0.5rem 0.9rem; background:var(--panel-2);
+    color:var(--tc,var(--text)); font-size:0.78rem; letter-spacing:0.03em;
+  }
+  .award-btn:hover{border-color:var(--tc,var(--cyan)); box-shadow:0 0 12px -4px var(--tc,var(--cyan));}
+
+  .wager-input-row{display:flex; align-items:center; gap:0.7rem; margin:1rem 0;}
+  .wager-input-row input[type=number]{
+    background:var(--panel-2); border:1px solid var(--border-bright); color:var(--text); border-radius:6px;
+    padding:0.55rem 0.7rem; font-size:1.05rem; width:9rem; font-variant-numeric:tabular-nums;
+  }
+  .team-pick{display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.8rem 0;}
+  .team-pick button{border-radius:6px; padding:0.55rem 0.9rem; border:1px solid var(--border-bright); background:var(--panel-2); color:var(--tc);}
+  .team-pick button.picked{box-shadow:0 0 0 2px var(--tc) inset; background:var(--panel-3);}
+
+  /* ---------- setup screen ---------- */
+  .setup-grid{display:grid; grid-template-columns:1fr; gap:1.2rem; width:100%; max-width:760px;}
+  @media (min-width:720px){.setup-grid{grid-template-columns:1fr 1fr;}}
+  .panel-block{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:1.2rem;}
+  .panel-block h3{font-size:0.85rem; letter-spacing:0.08em; color:var(--cyan); text-transform:uppercase; margin-bottom:0.9rem;}
+  .field-row{display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem;}
+  .field-row input[type=text]{
+    flex:1; background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:6px;
+    padding:0.5rem 0.7rem; font-size:0.85rem;
+  }
+  .swatch{width:12px; height:12px; border-radius:50%; flex:none;}
+  .count-toggle{display:flex; gap:0.4rem; margin-bottom:0.9rem;}
+  .count-toggle button{flex:1; padding:0.5rem; border-radius:6px; border:1px solid var(--border-bright); background:var(--panel-2); color:var(--text-dim);}
+  .count-toggle button.active{background:var(--amber); color:#1a1300; border-color:var(--amber);}
+  textarea.paste-box{
+    width:100%; min-height:7rem; background:#080b0f; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:0.6rem; font-size:0.72rem; resize:vertical;
+  }
+  .hint{font-size:0.68rem; color:var(--text-faint); margin-top:0.5rem; line-height:1.5;}
+  .import-status{font-size:0.72rem; margin-top:0.5rem; min-height:1em;}
+  .import-status.ok{color:var(--green);}
+  .import-status.err{color:var(--red);}
+  .content-choice{display:flex; gap:0.5rem; margin-bottom:0.8rem;}
+  .content-choice button{flex:1;}
+
+  /* ---------- final round ---------- */
+  .final-wrap{width:100%; max-width:640px; text-align:center; display:flex; flex-direction:column; gap:1rem; align-items:center;}
+  .final-wagers{display:grid; gap:0.6rem; width:100%; text-align:left;}
+  .final-wager-row{display:flex; align-items:center; gap:0.7rem; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.8rem;}
+  .final-wager-row .fname{flex:1; font-size:0.8rem; color:var(--tc);}
+  .final-wager-row input{
+    width:7rem; background:var(--panel); border:1px solid var(--border-bright); color:var(--text); border-radius:6px;
+    padding:0.4rem 0.6rem; font-variant-numeric:tabular-nums;
+  }
+  .final-judge-row{display:flex; align-items:center; gap:0.6rem; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.8rem; width:100%;}
+  .final-judge-row .fname{flex:1; font-size:0.8rem; color:var(--tc); text-align:left;}
+
+  /* ---------- results ---------- */
+  .results-wrap{width:100%; max-width:760px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:1.6rem;}
+  .podium{display:flex; align-items:flex-end; gap:1rem; justify-content:center; width:100%; flex-wrap:wrap;}
+  .podium-slot{display:flex; flex-direction:column; align-items:center; gap:0.5rem; width:9.5rem;}
+  .podium-rank{font-family:var(--font-display); font-size:0.75rem; color:var(--text-dim); letter-spacing:0.1em;}
+  .podium-block{
+    width:100%; border-radius:8px 8px 0 0; background:var(--panel-2); border:1px solid var(--border-bright);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:0.9rem; gap:0.3rem;
+  }
+  .podium-slot.p1 .podium-block{height:9rem; border-color:var(--amber); box-shadow:0 0 30px -8px rgba(255,182,39,0.5);}
+  .podium-slot.p2 .podium-block{height:6.6rem;}
+  .podium-slot.p3 .podium-block{height:5rem;}
+  .podium-name{font-size:0.75rem; color:var(--tc); text-transform:uppercase; letter-spacing:0.04em;}
+  .podium-score{font-family:var(--font-display); font-weight:700; font-size:1.3rem; color:var(--text);}
+  .confetti-layer{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:5;}
+  .confetti-bit{position:absolute; top:-5%; border-radius:2px; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(115vh) rotate(320deg); opacity:0.2;}}
+
+  .flash-layer{position:fixed; inset:0; pointer-events:none; z-index:60; opacity:0; transition:opacity .15s ease;}
+  .flash-layer.show{opacity:1;}
+  .flash-layer.good{background:radial-gradient(circle, rgba(58,219,118,0.18), transparent 70%);}
+  .flash-layer.bad{background:radial-gradient(circle, rgba(255,92,92,0.18), transparent 70%);}
+
+  .help-btn{position:fixed; top:1rem; right:1rem; z-index:40; width:2.1rem; height:2.1rem; border-radius:50%; border:1px solid var(--border-bright); background:var(--panel-2); color:var(--text-dim); font-family:var(--font-display);}
+  .help-btn:hover{color:var(--amber); border-color:var(--amber);}
+
+  footer.credit{margin-top:1.4rem; font-size:0.65rem; color:var(--text-faint); text-align:center;}
+
+  @media (max-width:640px){
+    .board-grid{gap:0.35rem;}
+    .cat-header{font-size:0.58rem; min-height:2.8rem; padding:0.4rem 0.2rem;}
+    .tile{font-size:0.85rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+</style>
+
+<div id="app"></div>
+<div id="flash" class="flash-layer"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TEAM_COLORS = ["#ffb627", "#4dd8e6", "#ff6ec7", "#9c87f5"];
+  var STORAGE_KEY = "mainframe_content_v1";
+
+  var DEFAULT_CATEGORIES = [
+    {
+      name: "ORG CHART ARCHIVES",
+      tiles: [
+        {value:100, q:"What's the term for the person you report directly to?", a:"Your manager (direct manager / supervisor)."},
+        {value:200, q:"In most org charts, which kind of line indicates a direct reporting relationship?", a:"A solid line — dotted lines usually mean an indirect or secondary relationship."},
+        {value:300, q:"What do you call an employee who has no direct reports?", a:"An individual contributor (IC)."},
+        {value:400, q:"What's the name for reporting to two managers at once, common in matrix organizations?", a:"A dotted-line, or matrixed, reporting relationship."},
+        {value:500, q:"When a company reshuffles its departments and reporting lines, what's this process commonly called?", a:"A reorg (reorganization)."}
+      ]
+    },
+    {
+      name: "TICKET LIFECYCLE",
+      tiles: [
+        {value:100, q:"What status does a new support ticket usually start in?", a:"Open (or New)."},
+        {value:200, q:"What do you call a ticket that's paused because it's waiting on the requester?", a:"Pending, or Waiting on Customer."},
+        {value:300, q:"What's the term for a ticket that's been resolved and confirmed by the requester?", a:"Closed."},
+        {value:400, q:"What's the acronym for the promised response or fix time in a support contract?", a:"SLA — Service Level Agreement.", special:"override"},
+        {value:500, q:"What do you call sending a ticket to a higher support tier when it can't be resolved at the first level?", a:"Escalation (a Tier 2 or Tier 3 escalation)."}
+      ]
+    },
+    {
+      name: "APPROVAL PROTOCOLS",
+      tiles: [
+        {value:100, q:"What's the common term for the person who must sign off before a purchase is made?", a:"The approver."},
+        {value:200, q:"What do you call a request that skips normal steps because it's urgent?", a:"An expedited, or emergency, approval."},
+        {value:300, q:"What's the term for a rule requiring two people to approve something before it proceeds?", a:"Two-person approval, or dual sign-off."},
+        {value:400, q:"What's it called when approval authority is passed down to someone at a lower level?", a:"Delegation of authority."},
+        {value:500, q:"What's the general term for the path a request travels through multiple approvers?", a:"An approval chain, or approval workflow."}
+      ]
+    },
+    {
+      name: "TOOL & SYSTEM IDs",
+      tiles: [
+        {value:100, q:"What's the common abbreviation for the software that manages employee records and payroll?", a:"HRIS — Human Resources Information System."},
+        {value:200, q:"What three-letter acronym describes software that tracks sales leads and customers?", a:"CRM — Customer Relationship Management."},
+        {value:300, q:"What acronym describes the single sign-on standard many companies use to log into multiple tools with one account?", a:"SSO — Single Sign-On.", special:"override"},
+        {value:400, q:"What's the term for software that manages a company's core operations, like finance and inventory, in one system?", a:"ERP — Enterprise Resource Planning."},
+        {value:500, q:"What do you call a temporary, unique code used for two-factor login verification?", a:"OTP — One-Time Passcode."}
+      ]
+    },
+    {
+      name: "POLICY & COMPLIANCE",
+      tiles: [
+        {value:100, q:"How much notice do most companies ask for before you take vacation, as a common rule of thumb?", a:"About two weeks — it varies by company."},
+        {value:200, q:"What's the name for the yearly refresher training on topics like security and workplace conduct?", a:"Compliance training (or annual training)."},
+        {value:300, q:"What do you call the document that outlines acceptable use of company devices and networks?", a:"The Acceptable Use Policy (AUP)."},
+        {value:400, q:"What's the formal name for reporting a concern anonymously through a secure channel?", a:"A whistleblower hotline, or ethics hotline."},
+        {value:500, q:"Company email retention policies commonly cite a range of how many years?", a:"Roughly 3–7 years, depending on the policy."}
+      ]
+    }
+  ];
+
+  var DEFAULT_FINAL = {
+    category: "COMPANY ACRONYMS",
+    q: "This three-letter acronym refers to the standard process employees use to request a day off.",
+    a: "PTO — Paid Time Off (request)."
+  };
+
+  var state = null;
+
+  function freshState(){
+    return {
+      phase: "start",
+      teams: [],
+      categories: null,
+      finalRound: null,
+      activeCat: -1,
+      activeTile: -1,
+      timer: {seconds:20, total:20, running:false, handle:null},
+      wager: {teamIdx:-1, amount:0, stage:"pick"},
+      finalWagers: {},
+      finalJudged: {},
+      finalRevealed: false,
+      log: [],
+      pendingContentText: "",
+      contentSource: "sample"
+    };
+  }
+
+  function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function loadSavedContent(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      var parsed = JSON.parse(raw);
+      if(parsed && parsed.categories && parsed.categories.length === 5) return parsed;
+    }catch(e){}
+    return null;
+  }
+
+  function saveContent(bank){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); }catch(e){}
+  }
+
+  function playTone(f0, f1, type, dur, gain){
+    try{
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return;
+      var ctx = new Ctx();
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = type;
+      g.gain.value = gain;
+      o.frequency.value = f0;
+      o.start();
+      if(f1) o.frequency.exponentialRampToValueAtTime(f1, ctx.currentTime + dur * 0.4);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+      o.stop(ctx.currentTime + dur + 0.02);
+      o.onended = function(){ ctx.close(); };
+    }catch(e){}
+  }
+
+  function beep(kind){
+    if(kind === "lockout"){
+      playTone(520, 180, "sawtooth", 0.5, 0.08);
+      setTimeout(function(){ playTone(520, 180, "sawtooth", 0.5, 0.08); }, 280);
+      return;
+    }
+    var freqs = kind === "good" ? [660,880] : kind === "bad" ? [220,140] : [440,null];
+    var type = kind === "bad" ? "sawtooth" : "square";
+    playTone(freqs[0], freqs[1], type, 0.32, 0.06);
+  }
+
+  function flash(kind){
+    var el = document.getElementById("flash");
+    el.className = "flash-layer show " + kind;
+    setTimeout(function(){ el.className = "flash-layer"; }, 420);
+  }
+
+  function log(msg){
+    state.log.push(msg);
+    if(state.log.length > 40) state.log.shift();
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* ---------------- render dispatch ---------------- */
+
+  function render(){
+    var app = document.getElementById("app");
+    if(state.phase === "start") app.innerHTML = renderStart();
+    else if(state.phase === "setup") app.innerHTML = renderSetup();
+    else if(state.phase === "board") app.innerHTML = renderBoard();
+    else if(state.phase === "final-intro") app.innerHTML = renderFinalIntro();
+    else if(state.phase === "final-wager") app.innerHTML = renderFinalWager();
+    else if(state.phase === "final-question") app.innerHTML = renderFinalQuestion();
+    else if(state.phase === "results") app.innerHTML = renderResults();
+    attachHandlers();
+    if(state.phase === "board" && state.activeTile >= 0){
+      renderModalInto();
+    }
+    if(state.pulseTeam){
+      var pulseEl = document.getElementById("score-" + state.pulseTeam.idx);
+      if(pulseEl){
+        var cls = state.pulseTeam.kind === "good" ? "pulse-good" : "pulse-bad";
+        pulseEl.classList.add(cls);
+        setTimeout(function(){ pulseEl.classList.remove("pulse-good","pulse-bad"); }, 700);
+      }
+      state.pulseTeam = null;
+    }
+  }
+
+  /* ---------------- START ---------------- */
+
+  function renderStart(){
+    return (
+      '<div class="start-screen">' +
+        '<div class="logo-wrap"><div class="logo">MAINFRAME</div>' +
+        '<div class="eyebrow" style="margin-top:0.6rem;">INTERNAL KNOWLEDGE ACCESS TERMINAL</div></div>' +
+        '<div class="tagline">A live trivia game about the processes, tools, and paperwork that run this place. Teams compete to access five classified files. Two files hide a SECURITY OVERRIDE — wager big, win big.</div>' +
+        '<pre class="boot-log" id="bootLog"></pre>' +
+        '<button class="btn btn-primary" id="newGameBtn" style="display:none;">NEW GAME &rarr;</button>' +
+      '</div>'
+    );
+  }
+
+  var BOOT_LINES = [
+    "> establishing uplink...",
+    "> authenticating host credentials... OK",
+    "> mounting category archives (5/5)... OK",
+    "> arming SECURITY OVERRIDE tiles (2)... OK",
+    "> loading scoreboard... OK",
+    "> mainframe ready."
+  ];
+
+  function runBoot(){
+    var el = document.getElementById("bootLog");
+    var btn = document.getElementById("newGameBtn");
+    if(!el) return;
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduced){
+      el.textContent = BOOT_LINES.join("\n");
+      btn.style.display = "inline-block";
+      return;
+    }
+    var i = 0;
+    function nextLine(){
+      if(i >= BOOT_LINES.length){
+        btn.style.display = "inline-block";
+        return;
+      }
+      el.textContent += (i ? "\n" : "") + BOOT_LINES[i];
+      i++;
+      setTimeout(nextLine, 260);
+    }
+    nextLine();
+  }
+
+  /* ---------------- SETUP ---------------- */
+
+  function renderSetup(){
+    var teamRows = state.teams.map(function(t, i){
+      return (
+        '<div class="field-row">' +
+          '<span class="swatch" style="background:' + t.color + '"></span>' +
+          '<input type="text" data-team-name="' + i + '" value="' + escapeHtml(t.name) + '" maxlength="24" />' +
+        '</div>'
+      );
+    }).join("");
+
+    var countBtns = [2,3,4].map(function(n){
+      return '<button data-team-count="' + n + '" class="' + (state.teams.length === n ? "active" : "") + '">' + n + " TEAMS</button>";
+    }).join("");
+
+    var srcSample = state.contentSource === "sample";
+    return (
+      '<div class="setup-grid">' +
+        '<div class="panel-block">' +
+          '<h3>Field Squads</h3>' +
+          '<div class="count-toggle">' + countBtns + '</div>' +
+          teamRows +
+          '<div class="hint">Click a name to rename a team before launch.</div>' +
+        '</div>' +
+        '<div class="panel-block">' +
+          '<h3>File Contents</h3>' +
+          '<div class="content-choice">' +
+            '<button class="btn btn-sm ' + (srcSample ? "btn-primary" : "btn-ghost") + '" data-src="sample">Use Sample Files</button>' +
+            '<button class="btn btn-sm ' + (!srcSample ? "btn-primary" : "btn-ghost") + '" data-src="custom">Paste My Own</button>' +
+          '</div>' +
+          (srcSample ? (
+            '<div class="hint">Five ready-made categories on internal processes, tools, and policy — generic enough to demo, easy to swap out below whenever you have real questions.</div>'
+          ) : (
+            '<textarea class="paste-box" id="pasteBox" placeholder="Category&#9;Value&#9;Question&#9;Answer">' + escapeHtml(state.pendingContentText) + '</textarea>' +
+            '<div class="hint">Copy 25 rows straight out of Excel (columns: Category, Value, Question, Answer — 5 categories &times; 5 values each: 100/200/300/400/500) and paste them here. Tab- or comma-separated both work.</div>' +
+            '<div class="btn-row" style="margin-top:0.6rem;"><button class="btn btn-sm" id="parseBtn">Load Pasted Content</button></div>' +
+            '<div class="import-status" id="importStatus"></div>'
+          )) +
+        '</div>' +
+      '</div>' +
+      '<div class="btn-row" style="margin-top:1.4rem;">' +
+        '<button class="btn btn-ghost" id="backBtn">&larr; Back</button>' +
+        '<button class="btn btn-primary" id="launchBtn">LAUNCH MAINFRAME &rarr;</button>' +
+      '</div>'
+    );
+  }
+
+  function parsePastedContent(text){
+    var lines = text.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+    if(lines.length === 0) return {error:"Paste some rows first."};
+    var rows = lines.map(function(l){
+      var parts = l.indexOf("\t") >= 0 ? l.split("\t") : l.split(",");
+      return parts.map(function(p){ return p.trim(); });
+    });
+    var bad = rows.filter(function(r){ return r.length < 4; });
+    if(bad.length) return {error:"Every row needs 4 columns: Category, Value, Question, Answer. " + bad.length + " row(s) didn't parse that way."};
+
+    var byCat = {};
+    var order = [];
+    rows.forEach(function(r){
+      var cat = r[0];
+      var value = parseInt(r[1], 10);
+      var q = r[2];
+      var a = r.slice(3).join(", ");
+      if(!byCat[cat]){ byCat[cat] = []; order.push(cat); }
+      byCat[cat].push({value: isNaN(value) ? 0 : value, q:q, a:a});
+    });
+
+    if(order.length !== 5) return {error:"Found " + order.length + " distinct categories — need exactly 5."};
+    var cats = order.map(function(name){
+      var tiles = byCat[name].slice().sort(function(a,b){ return a.value - b.value; });
+      if(tiles.length !== 5) return null;
+      return {name:name, tiles:tiles};
+    });
+    if(cats.indexOf(null) >= 0) return {error:"Each category needs exactly 5 rows (values 100–500). At least one didn't."};
+
+    return {categories:cats};
+  }
+
+  /* ---------------- BOARD ---------------- */
+
+  function leaderIdx(){
+    var max = -Infinity, idx = -1, tie = false;
+    state.teams.forEach(function(t,i){
+      if(t.score > max){ max = t.score; idx = i; tie = false; }
+      else if(t.score === max) tie = true;
+    });
+    return tie ? -1 : idx;
+  }
+
+  function renderScoreboard(){
+    var lead = leaderIdx();
+    return '<div class="scoreboard">' + state.teams.map(function(t,i){
+      return (
+        '<div class="team-card' + (i===lead ? " leader" : "") + '" style="--tc:' + t.color + '">' +
+          '<div class="team-name-row">' +
+            '<input class="team-name" style="--tc:' + t.color + '" data-team-name="' + i + '" value="' + escapeHtml(t.name) + '" maxlength="24" />' +
+            (i===lead ? '<span class="crown">★</span>' : '') +
+          '</div>' +
+          '<div class="team-score" id="score-' + i + '">' + t.score + '</div>' +
+          '<div class="team-adjust">' +
+            '<button data-adjust="' + i + ',-50">−50</button>' +
+            '<button data-adjust="' + i + ',50">+50</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("") + '</div>';
+  }
+
+  function allTilesUsed(){
+    return state.categories.every(function(c){ return c.tiles.every(function(t){ return t.used; }); });
+  }
+
+  function renderBoard(){
+    var headerRow = state.categories.map(function(c){ return '<div class="cat-header">' + escapeHtml(c.name) + '</div>'; }).join("");
+    var valueRows = [0,1,2,3,4].map(function(vi){
+      return state.categories.map(function(c, ci){
+        var t = c.tiles[vi];
+        var isSpecial = !!t.special;
+        return (
+          '<button class="tile' + (isSpecial ? " special" : "") + '" data-tile="' + ci + ',' + vi + '" ' + (t.used ? "disabled" : "") + '>' +
+            '<span>' + (isSpecial ? "♦" : "$") + t.value + '</span>' +
+          '</button>'
+        );
+      }).join("");
+    }).join("");
+
+    var done = allTilesUsed();
+
+    return (
+      '<div class="console">' +
+        '<div class="console-header">' +
+          '<div class="console-title"><span class="dot"></span><span>MAINFRAME // FILE ACCESS</span></div>' +
+          '<div class="round-label">Round 1 of 2</div>' +
+        '</div>' +
+        renderScoreboard() +
+        '<div class="board-grid">' + headerRow + valueRows + '</div>' +
+        '<div class="board-footer">' +
+          '<div class="hint">Click a tile once your teams have answered out loud, then award it to whoever got there first.</div>' +
+          '<button class="btn ' + (done ? "btn-primary" : "btn-ghost") + '" id="toFinalBtn" ' + (done ? "" : "disabled") + '>PROCEED TO MAINFRAME BREACH &rarr;</button>' +
+        '</div>' +
+        '<div class="syslog" id="syslog">' + state.log.slice().reverse().map(function(l){ return '<div>' + escapeHtml(l) + '</div>'; }).join("") + '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderModalInto(){
+    var stray = document.getElementById("overlay");
+    if(stray) stray.remove();
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.id = "overlay";
+    var cat = state.categories[state.activeCat];
+    var tile = cat.tiles[state.activeTile];
+
+    if(tile.special === "override" && state.wager.stage !== "done"){
+      overlay.innerHTML = renderWagerModal(cat, tile);
+    } else {
+      overlay.innerHTML = renderQuestionModal(cat, tile);
+    }
+    document.body.appendChild(overlay);
+    attachModalHandlers(cat, tile);
+    if(tile.revealed === undefined) tile.revealed = false;
+  }
+
+  function renderWagerModal(cat, tile){
+    var picking = state.wager.stage === "pick";
+    var teamButtons = state.teams.map(function(t,i){
+      return '<button data-pick-team="' + i + '" class="' + (state.wager.teamIdx===i ? "picked" : "") + '" style="--tc:' + t.color + '">' + escapeHtml(t.name) + '</button>';
+    }).join("");
+
+    if(picking){
+      return (
+        '<div class="modal wager-modal">' +
+          '<div class="modal-eyebrow"><span>SECURITY OVERRIDE ♦ ' + escapeHtml(cat.name) + '</span><span class="modal-value">$' + tile.value + '</span></div>' +
+          '<h2 style="color:var(--violet); font-size:1.1rem; margin-bottom:0.6rem;">A wildcard file. Which team hit the override?</h2>' +
+          '<div class="team-pick">' + teamButtons + '</div>' +
+          '<div class="btn-row"><button class="btn btn-ghost" id="cancelWager">Cancel</button></div>' +
+        '</div>'
+      );
+    }
+    var team = state.teams[state.wager.teamIdx];
+    var maxWager = Math.max(team.score, 500);
+    return (
+      '<div class="modal wager-modal">' +
+        '<div class="modal-eyebrow"><span>SECURITY OVERRIDE ♦ ' + escapeHtml(cat.name) + '</span><span class="modal-value" style="color:' + team.color + '">' + escapeHtml(team.name) + '</span></div>' +
+        '<h2 style="color:var(--violet); font-size:1.1rem; margin-bottom:0.4rem;">Name your wager.</h2>' +
+        '<div class="hint">Up to $' + maxWager + '. Get it right, gain the wager. Get it wrong, lose it.</div>' +
+        '<div class="wager-input-row"><input type="number" id="wagerAmount" min="0" max="' + maxWager + '" value="' + (state.wager.amount || Math.min(200,maxWager)) + '" /></div>' +
+        '<div class="btn-row"><button class="btn btn-ghost" id="cancelWager">Cancel</button><button class="btn btn-primary" id="confirmWager">Reveal File &rarr;</button></div>' +
+      '</div>'
+    );
+  }
+
+  function renderQuestionModal(cat, tile){
+    var pct = Math.max(0, Math.round(100 * state.timer.seconds / state.timer.total));
+    var low = state.timer.seconds <= 5;
+    var wagerNote = tile.special === "override" ? (' <span style="color:var(--violet)">— ' + escapeHtml(state.teams[state.wager.teamIdx].name) + " wagered $" + state.wager.amount + '</span>') : "";
+    var award = "";
+    if(tile.revealed){
+      var awardButtons = state.teams.map(function(t,i){
+        if(tile.special === "override" && i !== state.wager.teamIdx) return "";
+        return '<button class="award-btn" style="--tc:' + t.color + '" data-award="' + i + '">' + escapeHtml(t.name) + " got it</button>";
+      }).join("");
+      award = (
+        '<div class="award-row">' +
+          '<div class="label">Who got it right?</div>' +
+          '<div class="award-grid">' + awardButtons +
+            (tile.special === "override" ? '' : '<button class="award-btn" data-award="none">Nobody</button>') +
+          '</div>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="modal' + (tile.timedOut ? " locked-out" : "") + '">' +
+        '<div class="modal-eyebrow"><span>' + escapeHtml(cat.name) + wagerNote + '</span><span class="modal-value">$' + tile.value + '</span></div>' +
+        (tile.special !== "override" ? (
+          '<div class="timer-row"><div class="timer-bar"><div class="timer-fill' + (low?" low":"") + '" style="width:' + pct + '%"></div></div><div class="timer-num">' + state.timer.seconds + 's</div></div>' +
+          '<div class="btn-row" style="margin-bottom:0.8rem;">' +
+            '<button class="btn btn-sm" id="timerStart">' + (state.timer.running ? "Pause" : "Start Timer") + '</button>' +
+            '<button class="btn btn-sm btn-ghost" id="timerReset">Reset</button>' +
+          '</div>'
+        ) : "") +
+        (tile.timedOut && !tile.revealed ? '<div class="lockout-banner">&#9888; LOCKOUT — NO ACCESS RECORDED IN TIME</div>' : "") +
+        '<div class="modal-body">' + escapeHtml(tile.q) + '</div>' +
+        (tile.revealed ? '<div class="modal-answer">' + escapeHtml(tile.a) + '</div>' : '') +
+        '<div class="btn-row" style="margin-top:1.1rem;">' +
+          (!tile.revealed ? '<button class="btn btn-primary" id="revealBtn">Reveal Answer</button>' : '') +
+          '<button class="btn btn-ghost" id="closeModal">Close File</button>' +
+        '</div>' +
+        award +
+      '</div>'
+    );
+  }
+
+  /* ---------------- FINAL ROUND ---------------- */
+
+  function renderFinalIntro(){
+    return (
+      '<div class="final-wrap">' +
+        '<div class="eyebrow">FINAL SEQUENCE</div>' +
+        '<h1 class="logo" style="font-size:clamp(1.8rem,6vw,2.6rem); color:var(--red); text-shadow:0 0 24px rgba(255,92,92,0.4);">MAINFRAME BREACH</h1>' +
+        '<div class="tagline">One last file, category revealed now. Every team wagers before the question appears — winner takes the board.</div>' +
+        '<div class="panel-block" style="width:100%; max-width:420px;">' +
+          '<div class="eyebrow">CATEGORY</div>' +
+          '<h2 style="color:var(--cyan); margin-top:0.4rem;">' + escapeHtml(state.finalRound.category) + '</h2>' +
+        '</div>' +
+        '<button class="btn btn-primary" id="toWagerBtn">Collect Wagers &rarr;</button>' +
+      '</div>'
+    );
+  }
+
+  function renderFinalWager(){
+    var rows = state.teams.map(function(t,i){
+      var maxW = Math.max(t.score, 0);
+      return (
+        '<div class="final-wager-row" style="--tc:' + t.color + '">' +
+          '<span class="fname">' + escapeHtml(t.name) + ' <span class="hint" style="display:inline;">(' + t.score + ' pts)</span></span>' +
+          '<input type="number" min="0" max="' + Math.max(maxW,0) + '" value="' + (state.finalWagers[i] || 0) + '" data-final-wager="' + i + '" />' +
+        '</div>'
+      );
+    }).join("");
+    return (
+      '<div class="final-wrap">' +
+        '<div class="eyebrow">CATEGORY: ' + escapeHtml(state.finalRound.category) + '</div>' +
+        '<h2 style="color:var(--red);">Lock in wagers</h2>' +
+        '<div class="final-wagers">' + rows + '</div>' +
+        '<div class="hint">Teams with a score of 0 or below can wager $0.</div>' +
+        '<button class="btn btn-primary" id="revealFinalBtn">Reveal the Question &rarr;</button>' +
+      '</div>'
+    );
+  }
+
+  function renderFinalQuestion(){
+    var judgeRows = state.teams.map(function(t,i){
+      var judged = state.finalJudged[i];
+      return (
+        '<div class="final-judge-row" style="--tc:' + t.color + '">' +
+          '<span class="fname">' + escapeHtml(t.name) + ' wagered $' + (state.finalWagers[i]||0) + '</span>' +
+          (judged === undefined ? (
+            '<div class="btn-row"><button class="btn btn-sm btn-success" data-final-judge="' + i + ',1">Correct</button><button class="btn btn-sm btn-danger" data-final-judge="' + i + ',0">Incorrect</button></div>'
+          ) : '<span style="color:' + (judged ? "var(--green)" : "var(--red)") + '">' + (judged ? "CORRECT" : "INCORRECT") + '</span>')
+        + '</div>'
+      );
+    }).join("");
+
+    var allJudged = state.teams.every(function(t,i){ return state.finalJudged[i] !== undefined; });
+
+    return (
+      '<div class="final-wrap">' +
+        '<div class="eyebrow">' + escapeHtml(state.finalRound.category) + '</div>' +
+        '<div class="modal-body" style="max-width:34rem;">' + escapeHtml(state.finalRound.q) + '</div>' +
+        (state.finalRevealed ? '<div class="modal-answer" style="max-width:34rem;">' + escapeHtml(state.finalRound.a) + '</div>' : '<button class="btn btn-primary" id="revealFinalAnswerBtn">Reveal Answer</button>') +
+        (state.finalRevealed ? '<div class="final-wagers" style="margin-top:1rem;">' + judgeRows + '</div>' : '') +
+        (allJudged ? '<button class="btn btn-primary" id="toResultsBtn">See Final Standings &rarr;</button>' : '') +
+      '</div>'
+    );
+  }
+
+  /* ---------------- RESULTS ---------------- */
+
+  function renderResults(){
+    var ranked = state.teams.map(function(t,i){ return {t:t,i:i}; }).sort(function(a,b){ return b.t.score - a.t.score; });
+    var order = [1,0,2,3].filter(function(pos){ return ranked[pos]; });
+    var slots = order.map(function(pos){
+      var r = ranked[pos];
+      var rank = pos + 1;
+      var cls = rank===1 ? "p1" : rank===2 ? "p2" : "p3";
+      return (
+        '<div class="podium-slot ' + cls + '">' +
+          '<div class="podium-rank">' + (rank===1?"1ST":rank===2?"2ND":rank===3?"3RD":rank+"TH") + '</div>' +
+          '<div class="podium-block" style="--tc:' + r.t.color + '">' +
+            '<div class="podium-name" style="--tc:' + r.t.color + '">' + escapeHtml(r.t.name) + '</div>' +
+            '<div class="podium-score">' + r.t.score + '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+
+    return (
+      '<div class="results-wrap">' +
+        '<div class="eyebrow">SESSION COMPLETE</div>' +
+        '<h1 class="logo" style="font-size:clamp(1.8rem,6vw,2.6rem);">ACCESS GRANTED</h1>' +
+        '<div class="podium" id="podium">' + slots + '</div>' +
+        '<div class="btn-row">' +
+          '<button class="btn btn-primary" id="playAgainBtn">Play Again (Same Teams)</button>' +
+          '<button class="btn btn-ghost" id="fullResetBtn">Full Reset</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="confetti-layer" id="confettiLayer"></div>'
+    );
+  }
+
+  function spawnConfetti(){
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var layer = document.getElementById("confettiLayer");
+    if(!layer || reduced) return;
+    var colors = TEAM_COLORS;
+    for(var i=0;i<70;i++){
+      var bit = document.createElement("div");
+      bit.className = "confetti-bit";
+      var size = 4 + Math.random()*6;
+      bit.style.width = size + "px";
+      bit.style.height = (size*0.4) + "px";
+      bit.style.left = (Math.random()*100) + "vw";
+      bit.style.background = colors[i % colors.length];
+      bit.style.animationDuration = (2.2 + Math.random()*2.2) + "s";
+      bit.style.animationDelay = (Math.random()*0.6) + "s";
+      layer.appendChild(bit);
+    }
+    setTimeout(function(){ if(layer) layer.innerHTML = ""; }, 5200);
+  }
+
+  /* ---------------- event handlers ---------------- */
+
+  function attachHandlers(){
+    var app = document.getElementById("app");
+
+    var newGameBtn = document.getElementById("newGameBtn");
+    if(newGameBtn) newGameBtn.addEventListener("click", function(){
+      state.teams = makeTeams(3);
+      state.phase = "setup";
+      render();
+    });
+
+    app.querySelectorAll("[data-team-count]").forEach(function(b){
+      b.addEventListener("click", function(){
+        state.teams = makeTeams(parseInt(b.getAttribute("data-team-count"),10), state.teams);
+        render();
+      });
+    });
+
+    app.querySelectorAll("[data-team-name]").forEach(function(inp){
+      inp.addEventListener("input", function(){
+        var i = parseInt(inp.getAttribute("data-team-name"),10);
+        state.teams[i].name = inp.value;
+      });
+    });
+
+    app.querySelectorAll("[data-src]").forEach(function(b){
+      b.addEventListener("click", function(){
+        state.contentSource = b.getAttribute("data-src");
+        render();
+      });
+    });
+
+    var pasteBox = document.getElementById("pasteBox");
+    if(pasteBox) pasteBox.addEventListener("input", function(){ state.pendingContentText = pasteBox.value; });
+
+    var parseBtn = document.getElementById("parseBtn");
+    if(parseBtn) parseBtn.addEventListener("click", function(){
+      var res = parsePastedContent(state.pendingContentText || "");
+      var statusEl = document.getElementById("importStatus");
+      if(res.error){
+        statusEl.textContent = res.error;
+        statusEl.className = "import-status err";
+      } else {
+        state.customCategories = res.categories;
+        saveContent({categories:res.categories});
+        statusEl.textContent = "Loaded " + res.categories.length + " categories — 25 tiles ready.";
+        statusEl.className = "import-status ok";
+      }
+    });
+
+    var backBtn = document.getElementById("backBtn");
+    if(backBtn) backBtn.addEventListener("click", function(){ state.phase = "start"; render(); });
+
+    var launchBtn = document.getElementById("launchBtn");
+    if(launchBtn) launchBtn.addEventListener("click", function(){
+      var source;
+      if(state.contentSource === "custom"){
+        var res = parsePastedContent(state.pendingContentText || "");
+        if(res.error){
+          var statusEl = document.getElementById("importStatus");
+          if(statusEl){ statusEl.textContent = res.error; statusEl.className = "import-status err"; }
+          return;
+        }
+        source = res.categories;
+      } else {
+        source = DEFAULT_CATEGORIES;
+      }
+      state.categories = clone(source).map(function(c){
+        c.tiles = c.tiles.map(function(t){ t.used = false; t.revealed = false; return t; });
+        return c;
+      });
+      state.finalRound = clone(DEFAULT_FINAL);
+      state.log = [];
+      log("mainframe session started with " + state.teams.length + " teams.");
+      state.phase = "board";
+      render();
+    });
+
+    app.querySelectorAll("[data-adjust]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var parts = b.getAttribute("data-adjust").split(",");
+        var i = parseInt(parts[0],10), delta = parseInt(parts[1],10);
+        bumpScore(i, delta);
+        log((delta>0?"+":"") + delta + " manual adjustment — " + state.teams[i].name + ".");
+        render();
+      });
+    });
+
+    app.querySelectorAll("[data-tile]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var parts = b.getAttribute("data-tile").split(",");
+        state.activeCat = parseInt(parts[0],10);
+        state.activeTile = parseInt(parts[1],10);
+        var tile = state.categories[state.activeCat].tiles[state.activeTile];
+        state.timer = {seconds:20, total:20, running:false, handle:null};
+        tile.timedOut = false;
+        if(tile.special === "override"){
+          state.wager = {teamIdx:-1, amount:0, stage:"pick"};
+        }
+        render();
+      });
+    });
+
+    var toFinalBtn = document.getElementById("toFinalBtn");
+    if(toFinalBtn && !toFinalBtn.disabled) toFinalBtn.addEventListener("click", function(){
+      state.phase = "final-intro";
+      render();
+    });
+
+    var toWagerBtn = document.getElementById("toWagerBtn");
+    if(toWagerBtn) toWagerBtn.addEventListener("click", function(){
+      state.finalWagers = {};
+      state.phase = "final-wager";
+      render();
+    });
+
+    app.querySelectorAll("[data-final-wager]").forEach(function(inp){
+      inp.addEventListener("input", function(){
+        var i = parseInt(inp.getAttribute("data-final-wager"),10);
+        var maxW = Math.max(state.teams[i].score,0);
+        var v = Math.max(0, Math.min(maxW, parseInt(inp.value,10) || 0));
+        state.finalWagers[i] = v;
+      });
+    });
+
+    var revealFinalBtn = document.getElementById("revealFinalBtn");
+    if(revealFinalBtn) revealFinalBtn.addEventListener("click", function(){
+      state.teams.forEach(function(t,i){ if(state.finalWagers[i] === undefined) state.finalWagers[i] = 0; });
+      state.finalJudged = {};
+      state.finalRevealed = false;
+      state.phase = "final-question";
+      render();
+    });
+
+    var revealFinalAnswerBtn = document.getElementById("revealFinalAnswerBtn");
+    if(revealFinalAnswerBtn) revealFinalAnswerBtn.addEventListener("click", function(){
+      state.finalRevealed = true;
+      render();
+    });
+
+    app.querySelectorAll("[data-final-judge]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var parts = b.getAttribute("data-final-judge").split(",");
+        var i = parseInt(parts[0],10), correct = parts[1] === "1";
+        state.finalJudged[i] = correct;
+        var wager = state.finalWagers[i] || 0;
+        bumpScore(i, correct ? wager : -wager);
+        flash(correct ? "good" : "bad");
+        beep(correct ? "good" : "bad");
+        render();
+      });
+    });
+
+    var toResultsBtn = document.getElementById("toResultsBtn");
+    if(toResultsBtn) toResultsBtn.addEventListener("click", function(){
+      state.phase = "results";
+      render();
+      spawnConfetti();
+    });
+
+    var playAgainBtn = document.getElementById("playAgainBtn");
+    if(playAgainBtn) playAgainBtn.addEventListener("click", function(){
+      state.teams.forEach(function(t){ t.score = 0; });
+      state.phase = "setup";
+      render();
+    });
+
+    var fullResetBtn = document.getElementById("fullResetBtn");
+    if(fullResetBtn) fullResetBtn.addEventListener("click", function(){
+      state = freshState();
+      render();
+      runBoot();
+    });
+  }
+
+  function attachModalHandlers(cat, tile){
+    var overlay = document.getElementById("overlay");
+    if(!overlay) return;
+
+    var cancelWager = document.getElementById("cancelWager");
+    if(cancelWager) cancelWager.addEventListener("click", closeTileModal);
+
+    overlay.querySelectorAll("[data-pick-team]").forEach(function(b){
+      b.addEventListener("click", function(){
+        state.wager.teamIdx = parseInt(b.getAttribute("data-pick-team"),10);
+        state.wager.stage = "amount";
+        rerenderOverlay(cat, tile);
+      });
+    });
+
+    var confirmWager = document.getElementById("confirmWager");
+    if(confirmWager) confirmWager.addEventListener("click", function(){
+      var amtInput = document.getElementById("wagerAmount");
+      var maxWager = Math.max(state.teams[state.wager.teamIdx].score, 500);
+      var amt = Math.max(0, Math.min(maxWager, parseInt(amtInput.value,10) || 0));
+      state.wager.amount = amt;
+      state.wager.stage = "done";
+      log(state.teams[state.wager.teamIdx].name + " wagered $" + amt + " on a SECURITY OVERRIDE.");
+      state.timer = {seconds:20, total:20, running:false, handle:null};
+      rerenderOverlay(cat, tile);
+    });
+
+    var timerStart = document.getElementById("timerStart");
+    if(timerStart) timerStart.addEventListener("click", function(){
+      if(state.timer.running){
+        clearInterval(state.timer.handle);
+        state.timer.running = false;
+      } else {
+        state.timer.running = true;
+        state.timer.handle = setInterval(function(){
+          state.timer.seconds = Math.max(0, state.timer.seconds - 1);
+          if(state.timer.seconds === 0){
+            clearInterval(state.timer.handle);
+            state.timer.running = false;
+            if(!tile.timedOut && !tile.revealed){
+              tile.timedOut = true;
+              log("LOCKOUT — nobody accessed " + cat.name + " $" + tile.value + " in time.");
+              flash("bad");
+              beep("lockout");
+            }
+          }
+          rerenderOverlay(cat, tile);
+          if(tile.timedOut){
+            var m = document.querySelector(".modal");
+            if(m){
+              m.classList.add("shake-once");
+              setTimeout(function(){ if(m) m.classList.remove("shake-once"); }, 520);
+            }
+          }
+        }, 1000);
+      }
+      rerenderOverlay(cat, tile);
+    });
+
+    var timerReset = document.getElementById("timerReset");
+    if(timerReset) timerReset.addEventListener("click", function(){
+      clearInterval(state.timer.handle);
+      state.timer = {seconds:20, total:20, running:false, handle:null};
+      tile.timedOut = false;
+      rerenderOverlay(cat, tile);
+    });
+
+    var revealBtn = document.getElementById("revealBtn");
+    if(revealBtn) revealBtn.addEventListener("click", function(){
+      tile.revealed = true;
+      clearInterval(state.timer.handle);
+      rerenderOverlay(cat, tile);
+    });
+
+    var closeModal = document.getElementById("closeModal");
+    if(closeModal) closeModal.addEventListener("click", closeTileModal);
+
+    overlay.querySelectorAll("[data-award]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var val = b.getAttribute("data-award");
+        if(tile.special === "override"){
+          var i = state.wager.teamIdx;
+          var correct = val === String(i);
+          bumpScore(i, correct ? state.wager.amount : -state.wager.amount);
+          log((correct?"ACCESS GRANTED":"ACCESS DENIED") + " — " + state.teams[i].name + " on override, $" + state.wager.amount + ".");
+          flash(correct ? "good" : "bad");
+          beep(correct ? "good" : "bad");
+        } else if(val === "none"){
+          log("Nobody accessed " + cat.name + " $" + tile.value + ".");
+        } else {
+          var idx = parseInt(val,10);
+          bumpScore(idx, tile.value);
+          log("ACCESS GRANTED — " + state.teams[idx].name + " +$" + tile.value + " (" + cat.name + ").");
+          flash("good");
+          beep("good");
+        }
+        tile.used = true;
+        closeTileModal();
+      });
+    });
+  }
+
+  function rerenderOverlay(cat, tile){
+    var overlay = document.getElementById("overlay");
+    if(!overlay) return;
+    if(tile.special === "override" && state.wager.stage !== "done"){
+      overlay.innerHTML = renderWagerModal(cat, tile);
+    } else {
+      overlay.innerHTML = renderQuestionModal(cat, tile);
+    }
+    attachModalHandlers(cat, tile);
+  }
+
+  function closeTileModal(){
+    var overlay = document.getElementById("overlay");
+    if(overlay) overlay.remove();
+    if(state.timer.handle) clearInterval(state.timer.handle);
+    state.activeCat = -1;
+    state.activeTile = -1;
+    render();
+  }
+
+  function bumpScore(i, delta){
+    state.teams[i].score += delta;
+    state.pulseTeam = {idx:i, kind: delta >= 0 ? "good" : "bad"};
+  }
+
+  function makeTeams(count, existing){
+    existing = existing || [];
+    var names = ["TEAM ALPHA","TEAM BRAVO","TEAM CHARLIE","TEAM DELTA"];
+    var out = [];
+    for(var i=0;i<count;i++){
+      out.push(existing[i] ? existing[i] : {name:names[i], color:TEAM_COLORS[i], score:0});
+    }
+    return out;
+  }
+
+  /* ---------------- boot ---------------- */
+
+  state = freshState();
+  var saved = loadSavedContent();
+  if(saved) state.pendingContentText = "";
+  render();
+  runBoot();
+
+})();
+</script>
